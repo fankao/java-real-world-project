@@ -10,25 +10,13 @@ import java.util.List;
 public class BankStatementAnalyzer {
     private static final String RESOURCES = "src/main/resources/";
 
-    public void analyze(final String fileName,final BankStatementParser bankStatementParser) throws IOException {
+    public void analyze(final String fileName,final BankStatementParser bankStatementParser,Exporter exporter) throws IOException {
         final Path path = Paths.get(RESOURCES + fileName);
         final List<String> lines = Files.readAllLines(path);
         final List<BankTransaction> bankTransactions = bankStatementParser.parseLinesFrom(lines);
         final BankStatementProcessor bankStatementProcessor = new BankStatementProcessor(bankTransactions);
-        collectSummary(bankStatementProcessor);
+        final SummaryStatistics summaryStatistics = bankStatementProcessor.summaryStatistics();
+        System.out.printf(exporter.export(summaryStatistics));
     }
 
-    private static void collectSummary(BankStatementProcessor bankStatementProcessor) {
-        System.out.println("The total for all transactions is "
-                + bankStatementProcessor.calculateTotalAmount());
-        System.out.println("The total for transactions in January is "
-                +
-                bankStatementProcessor.calculateTotalInMonth(Month.JANUARY));
-        System.out.println("The total for transactions in February is "
-                +
-                bankStatementProcessor.calculateTotalInMonth(Month.FEBRUARY));
-        System.out.println("The total salary received is "
-                +
-                bankStatementProcessor.calculateTotalForCategory("Salary"));
-    }
 }
